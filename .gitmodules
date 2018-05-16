@@ -1,0 +1,6 @@
+[submodule "backend/vendor"]
+	path = backend/vendor
+	url = git@github.com:maxmcd/c4-vendor.git
+[submodule "backend/third_party/googleapis"]
+	path = backend/third_party/googleapis
+	url = https://github.com/googleapis/googleapis
