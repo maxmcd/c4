@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package api;
+
+import "google/api/annotations.proto";
+
+// GameService specifies the interface through which clients authenticate
+service GameService {
+        rpc JoinPool(JoinPoolRequest)
+                returns (JoinPoolResponse) {
+                        option (google.api.http) = {
+                                post: "/v0/game/join-pool"
+                                body: "*"
+                        };
+                }
+        rpc SendMove(SendMoveRequest)
+                returns (SendMoveResponse) {
+                        option (google.api.http) = {
+                                post: "/v0/game/{id}/send-move"
+                                body: "*"
+                        };
+                }
+        rpc ReceiveMove(ReceiveMoveRequest)
+                returns (stream ReceiveMoveResponse) {
+                        option (google.api.http) = {
+                                get: "/v0/game/{id}/receive-move"
+                        };
+                }
+}
+
+message JoinPoolRequest {}
+
+message JoinPoolResponse {
+    string id = 1;
+}
+
+message SendMoveRequest {
+    string id = 1;
+
+    string command = 2;
+    string board = 3;
+}
+
+message SendMoveResponse {}
+
+message ReceiveMoveRequest {
+    string id = 1;
+}
+
+message ReceiveMoveResponse {
+    string command = 2;
+    string board = 3;
+}

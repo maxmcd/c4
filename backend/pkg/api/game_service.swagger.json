@@ -1,0 +1,142 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "game_service.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v0/game/join-pool": {
+      "post": {
+        "operationId": "JoinPool",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/apiJoinPoolResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/apiJoinPoolRequest"
+            }
+          }
+        ],
+        "tags": [
+          "GameService"
+        ]
+      }
+    },
+    "/v0/game/{id}/receive-move": {
+      "get": {
+        "operationId": "ReceiveMove",
+        "responses": {
+          "200": {
+            "description": "(streaming responses)",
+            "schema": {
+              "$ref": "#/definitions/apiReceiveMoveResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "GameService"
+        ]
+      }
+    },
+    "/v0/game/{id}/send-move": {
+      "post": {
+        "operationId": "SendMove",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/apiSendMoveResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/apiSendMoveRequest"
+            }
+          }
+        ],
+        "tags": [
+          "GameService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "apiJoinPoolRequest": {
+      "type": "object"
+    },
+    "apiJoinPoolResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "apiReceiveMoveResponse": {
+      "type": "object",
+      "properties": {
+        "command": {
+          "type": "string"
+        },
+        "board": {
+          "type": "string"
+        }
+      }
+    },
+    "apiSendMoveRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "command": {
+          "type": "string"
+        },
+        "board": {
+          "type": "string"
+        }
+      }
+    },
+    "apiSendMoveResponse": {
+      "type": "object"
+    }
+  }
+}

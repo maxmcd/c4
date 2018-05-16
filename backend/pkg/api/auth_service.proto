@@ -13,20 +13,6 @@ service AuthService {
                                 body: "*"
                         };
                 }
-        rpc AuthenticateEmail(AuthenticateEmailRequest)
-                returns (AuthenticateEmailResponse) {
-                        option (google.api.http) = {
-                                post: "/v0/authenticate/email"
-                                body: "*"
-                        };
-                }
-        rpc RegisterEmail(RegisterEmailRequest)
-                returns (RegisterEmailResponse) {
-                        option (google.api.http) = {
-                                post: "/v0/authenticate/email/register"
-                                body: "*"
-                        };
-                }
         rpc SmsCodeCheck(SmsCodeCheckRequest)
                 returns (SmsCodeCheckResponse) {
                         option (google.api.http) = {
@@ -42,26 +28,6 @@ message AuthenticateRequest {
 
 message AuthenticateResponse {
     string request_id = 1;
-}
-
-message AuthenticateEmailRequest {
-    string email = 1;
-    string password = 2;
-}
-
-message AuthenticateEmailResponse {
-    string token = 1;
-    uint64 user_id = 2;
-}
-
-message RegisterEmailRequest {
-    string email = 1;
-    string password = 2;
-}
-
-message RegisterEmailResponse {
-    string token = 1;
-    uint64 user_id = 2;
 }
 
 message SmsCodeCheckRequest {

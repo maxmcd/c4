@@ -41,58 +41,6 @@
         ]
       }
     },
-    "/v0/authenticate/email": {
-      "post": {
-        "operationId": "AuthenticateEmail",
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/apiAuthenticateEmailResponse"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/apiAuthenticateEmailRequest"
-            }
-          }
-        ],
-        "tags": [
-          "AuthService"
-        ]
-      }
-    },
-    "/v0/authenticate/email/register": {
-      "post": {
-        "operationId": "RegisterEmail",
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/apiRegisterEmailResponse"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/apiRegisterEmailRequest"
-            }
-          }
-        ],
-        "tags": [
-          "AuthService"
-        ]
-      }
-    },
     "/v0/authenticate/sms-code-check": {
       "post": {
         "operationId": "SmsCodeCheck",
@@ -121,29 +69,6 @@
     }
   },
   "definitions": {
-    "apiAuthenticateEmailRequest": {
-      "type": "object",
-      "properties": {
-        "email": {
-          "type": "string"
-        },
-        "password": {
-          "type": "string"
-        }
-      }
-    },
-    "apiAuthenticateEmailResponse": {
-      "type": "object",
-      "properties": {
-        "token": {
-          "type": "string"
-        },
-        "user_id": {
-          "type": "string",
-          "format": "uint64"
-        }
-      }
-    },
     "apiAuthenticateRequest": {
       "type": "object",
       "properties": {
@@ -157,29 +82,6 @@
       "properties": {
         "request_id": {
           "type": "string"
-        }
-      }
-    },
-    "apiRegisterEmailRequest": {
-      "type": "object",
-      "properties": {
-        "email": {
-          "type": "string"
-        },
-        "password": {
-          "type": "string"
-        }
-      }
-    },
-    "apiRegisterEmailResponse": {
-      "type": "object",
-      "properties": {
-        "token": {
-          "type": "string"
-        },
-        "user_id": {
-          "type": "string",
-          "format": "uint64"
         }
       }
     },
