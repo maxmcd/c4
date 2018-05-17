@@ -3,6 +3,7 @@ syntax = "proto3";
 package api;
 
 import "google/api/annotations.proto";
+import "google/rpc/status.proto";
 
 // GameService specifies the interface through which clients authenticate
 service GameService {
@@ -48,6 +49,14 @@ message ReceiveMoveRequest {
 }
 
 message ReceiveMoveResponse {
+    google.rpc.Status status = 1;
+
     string command = 2;
     string board = 3;
+}
+
+message Game {
+    string id = 1;
+    uint64 red_user_id = 2;
+    uint64 black_user_id = 3;
 }
