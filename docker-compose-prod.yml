@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ./.docker/apiserver.Dockerfile
+    image: maxmcd/c4

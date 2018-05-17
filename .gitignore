@@ -1,1 +1,8 @@
 .DS_Store
+local.env
+
+
+# https://github.com/github/gitignore/blob/master/Terraform.gitignore
+**/.terraform/*
+*.tfstate
+*.tfstate.*

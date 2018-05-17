@@ -1,0 +1,30 @@
+version: '3'
+
+volumes:
+  c4_db_data:
+    external: true
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ./.docker/apiserver_dev.Dockerfile
+    volumes:
+      - ./backend:/go/src/github.com/maxmcd/c4/backend
+    ports:
+      - 8083:8083
+      - 8085:8085
+    env_file:
+      - local.env
+    depends_on:
+      - postgres
+    restart: "always"
+  postgres:
+    image: postgres:9.6
+    volumes:
+      - c4_db_data:/var/lib/postgresql/data
+    env_file:
+      - local.env
+    ports:
+      - "5432:5432"
+    restart: always
