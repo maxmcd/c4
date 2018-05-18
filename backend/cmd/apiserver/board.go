@@ -2,18 +2,15 @@ package main
 
 import (
 	"errors"
-	"fmt"
-	"strings"
 )
 
 const (
-	InitialBoard = ""
-	RED          = "r"
-	BLACK        = "b"
+	RED   = "red"
+	BLACK = "black"
 )
 
 type Board struct {
-	data string
+	data []int
 }
 
 var runeIntMap map[rune]int
@@ -30,14 +27,27 @@ func init() {
 	}
 }
 
+func boardFromString(moves string) (board Board) {
+	for _, runeValue := range moves {
+		board.data = append(board.data, runeIntMap[runeValue])
+	}
+	return
+}
+
 func (b *Board) playMove(column int) error {
 	if len(b.data) == 6*7 {
 		return errors.New("Board full")
 	}
-	if strings.Count(b.data, fmt.Sprintf("%d", column)) == 6 {
+	var count int
+	for _, move := range b.data {
+		if move == column {
+			count += 1
+		}
+	}
+	if count == 6 {
 		return errors.New("Column full")
 	}
-	b.data = fmt.Sprintf("%s%d", b.data, column)
+	b.data = append(b.data, column)
 	return nil
 }
 
@@ -51,8 +61,7 @@ func (b *Board) whoIsNext() string {
 func (b *Board) asMatrix() (board [7][7]rune) {
 	var counters [7]int
 	colors := [2]rune{'r', 'b'}
-	for index, runeValue := range b.data {
-		column := runeIntMap[runeValue]
+	for index, column := range b.data {
 		board[column][counters[column]] = colors[index%2]
 		counters[column] += 1
 	}

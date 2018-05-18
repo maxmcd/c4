@@ -14,7 +14,7 @@ func TestBoardIsWon(t *testing.T) {
 		"444444326555553233226131666",
 	}
 	for _, test := range tests {
-		board := Board{data: test}
+		board := boardFromString(test)
 		if board.isWon() != 'r' {
 			t.Errorf("Should be a winner %s", test)
 		}
