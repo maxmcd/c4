@@ -15,7 +15,7 @@ func TestBoardIsWon(t *testing.T) {
 	}
 	for _, test := range tests {
 		board := boardFromString(test)
-		if board.isWon() != 'r' {
+		if board.isWon() != RED {
 			t.Errorf("Should be a winner %s", test)
 		}
 	}
@@ -23,10 +23,9 @@ func TestBoardIsWon(t *testing.T) {
 
 func BenchmarkIsWon(b *testing.B) {
 	rand.Seed(time.Now().UnixNano())
-	var nilRune rune
 	for n := 0; n < b.N; n++ {
 		board := Board{}
-		for board.isWon() == nilRune {
+		for board.isWon() == 0 {
 			board.playMove(rand.Intn(7))
 			if len(board.data) == 6*7 {
 				break
