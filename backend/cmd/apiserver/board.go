@@ -5,8 +5,10 @@ import (
 )
 
 const (
-	RED   = 1
-	BLACK = 2
+	RED          = 1
+	BLACK        = 2
+	BOARD_WIDTH  = 7
+	BOARD_HEIGHT = 6
 )
 
 var runeIntMap = map[rune]int{
@@ -54,7 +56,7 @@ func (b *Board) whoIsNext() int {
 	return RED
 }
 
-func (b *Board) asMatrix() (board [7][7]int) {
+func (b *Board) asMatrix() (board [7][6]int) {
 	var counters [7]int
 	for index, column := range b.data {
 		board[column][counters[column]] = (index % 2) + 1
@@ -66,8 +68,8 @@ func (b *Board) asMatrix() (board [7][7]int) {
 func (b *Board) isWon() int {
 	board := b.asMatrix()
 	// horizontalCheck
-	for j := 0; j < 7-3; j++ {
-		for i := 0; i < 7; i++ {
+	for j := 0; j < BOARD_HEIGHT-3; j++ {
+		for i := 0; i < BOARD_WIDTH; i++ {
 			if (board[i][j] == RED || board[i][j] == BLACK) &&
 				board[i][j] == board[i][j+1] &&
 				board[i][j] == board[i][j+2] &&
@@ -77,8 +79,8 @@ func (b *Board) isWon() int {
 		}
 	}
 	// verticalCheck
-	for i := 0; i < 7-3; i++ {
-		for j := 0; j < 7; j++ {
+	for i := 0; i < BOARD_WIDTH-3; i++ {
+		for j := 0; j < BOARD_HEIGHT; j++ {
 			if (board[i][j] == RED || board[i][j] == BLACK) &&
 				board[i][j] == board[i+1][j] &&
 				board[i][j] == board[i+2][j] &&
@@ -88,8 +90,8 @@ func (b *Board) isWon() int {
 		}
 	}
 	// ascendingDiagonalCheck
-	for i := 3; i < 7; i++ {
-		for j := 0; j < 7-3; j++ {
+	for i := 3; i < BOARD_WIDTH; i++ {
+		for j := 0; j < BOARD_HEIGHT-3; j++ {
 			if (board[i][j] == RED || board[i][j] == BLACK) &&
 				board[i][j] == board[i-1][j+1] &&
 				board[i][j] == board[i-2][j+2] &&
@@ -99,8 +101,8 @@ func (b *Board) isWon() int {
 		}
 	}
 	// descendingDiagonalCheck
-	for i := 3; i < 7; i++ {
-		for j := 3; j < 7; j++ {
+	for i := 3; i < BOARD_WIDTH; i++ {
+		for j := 3; j < BOARD_HEIGHT; j++ {
 			if (board[i][j] == RED || board[i][j] == BLACK) &&
 				board[i][j] == board[i-1][j-1] &&
 				board[i][j] == board[i-2][j-2] &&

@@ -23,6 +23,10 @@ services:
     image: postgres:9.6
     volumes:
       - c4_db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: c4
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: c4
     env_file:
       - local.env
     ports:

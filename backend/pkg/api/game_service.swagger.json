@@ -99,14 +99,28 @@
     }
   },
   "definitions": {
+    "apiGame": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "red_user": {
+          "$ref": "#/definitions/apiUser"
+        },
+        "black_user": {
+          "$ref": "#/definitions/apiUser"
+        }
+      }
+    },
     "apiJoinPoolRequest": {
       "type": "object"
     },
     "apiJoinPoolResponse": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string"
+        "game": {
+          "$ref": "#/definitions/apiGame"
         }
       }
     },
@@ -140,6 +154,18 @@
     },
     "apiSendMoveResponse": {
       "type": "object"
+    },
+    "apiUser": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "username": {
+          "type": "string"
+        }
+      }
     },
     "protobufAny": {
       "type": "object",

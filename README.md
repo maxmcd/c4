@@ -1,8 +1,7 @@
 # C4
 
-Board state notation
-1/2/3/4/5/6/7
-r/b/r/b/r/b/r
+Board state notation:
+"444444326555553233226131666"
 
 Features
 

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/maxmcd/c4/backend/pkg/api"
 	"github.com/maxmcd/c4/backend/pkg/config"
 )
 
@@ -16,9 +17,8 @@ type User struct {
 	UpdatedAt      time.Time
 	Phone          *sql.NullInt64
 	CountryCode    *sql.NullInt64
-	Email          *sql.NullString
 	Username       *sql.NullString
-	PasswordHash   string
+	Rating         uint // 150000 => 1500.00
 	NexmoRequestID string
 }
 
@@ -49,4 +49,11 @@ func (u *User) PhoneNumber() string {
 		return fmt.Sprintf("%d%d", u.CountryCode.Int64, u.Phone.Int64)
 	}
 	return ""
+}
+
+func (u *User) AsApiUser() *api.User {
+	return &api.User{
+		Id:       uint64(u.ID),
+		Username: u.UsernameString(),
+	}
 }

@@ -20,6 +20,7 @@ It has these top-level messages:
 	ReceiveMoveRequest
 	ReceiveMoveResponse
 	Game
+	User
 */
 package api
 

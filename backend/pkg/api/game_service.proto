@@ -32,7 +32,7 @@ service GameService {
 message JoinPoolRequest {}
 
 message JoinPoolResponse {
-    string id = 1;
+    Game game = 1;
 }
 
 message SendMoveRequest {
@@ -57,6 +57,11 @@ message ReceiveMoveResponse {
 
 message Game {
     string id = 1;
-    uint64 red_user_id = 2;
-    uint64 black_user_id = 3;
+    User red_user = 2;
+    User black_user = 3;
+}
+
+message User {
+    uint64 id = 1;
+    string username = 2;
 }

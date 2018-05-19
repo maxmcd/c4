@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"sync"
+	"time"
 
 	"golang.org/x/net/context"
 
@@ -24,38 +26,62 @@ var (
 )
 
 type APIServer struct {
-	// TODO: Persist these to some type of data store later
-	// map of stream id to stream object
-	games map[string]*api.Game
-	// TODO: These updates need to be streamed over a real backplane
-	backplane *Backplane
-	db        *gorm.DB
+	games         *GameStore
+	backplane     *Backplane
+	db            *gorm.DB
+	doneChan      chan bool
+	enterPoolChan chan PoolUser
 }
 
 func NewAPIServer() (*APIServer, error) {
 	// TODO: Cleanly close database connection on API server close
+	// TODO: Shutdown pool on API server close
 	db, err := gorm.Open("postgres", config.DatabaseUrl("postgres"))
 	if err != nil {
 		return nil, err
 	}
+
+	enterPoolChan := make(chan PoolUser)
+	doneChan := make(chan bool)
+	games := GameStore{syncMap: sync.Map{}}
+	go runPool(enterPoolChan, doneChan, &games)
+
 	return &APIServer{
-		games:     make(map[string]*api.Game),
-		backplane: NewBackplane(),
-		db:        db,
+		games:         &games,
+		backplane:     NewBackplane(),
+		db:            db,
+		enterPoolChan: enterPoolChan,
+		doneChan:      doneChan,
 	}, nil
 }
 
 func (s *APIServer) JoinPool(ctx context.Context, req *api.JoinPoolRequest) (*api.JoinPoolResponse, error) {
-	return &api.JoinPoolResponse{}, nil
+	userId := ctx.Value("userId").(int)
+	var user models.User
+	if err := s.db.Where("user_id = ?", userId).First(&user).Error; err != nil {
+		return nil, err
+	}
+	gameChan := make(chan api.Game)
+	poolUser := PoolUser{
+		User:     user,
+		Joined:   time.Now(),
+		GameChan: gameChan,
+	}
+	s.enterPoolChan <- poolUser
+
+	game := <-gameChan
+
+	return &api.JoinPoolResponse{
+		Game: &game,
+	}, nil
 }
 
 func (s *APIServer) SendMove(ctx context.Context, req *api.SendMoveRequest) (*api.SendMoveResponse, error) {
 	// Ensure that the game exists
-	if _, ok := s.games[req.Id]; !ok {
+	if _, ok := s.games.Retrieve(req.Id); !ok {
 		return nil, ErrGameIdNotFound(req.Id)
 	}
 
-	// Publish this module to anyone listening in on this game id
 	s.backplane.Publish(fmt.Sprintf("game.%s", req.Id), req)
 
 	return &api.SendMoveResponse{}, nil
