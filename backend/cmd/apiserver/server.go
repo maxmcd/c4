@@ -106,7 +106,10 @@ func (s *APIServer) SendMove(ctx context.Context, req *api.SendMoveRequest) (*ap
 		if isWon != 0 {
 			return nil, ErrGameIsOver()
 		}
-		game.Board.PlayMove(int(req.Column))
+		err := game.Board.PlayMove(int(req.Column))
+		if err != nil {
+			return nil, err
+		}
 		if game.ClockStart == nil && len(game.Board.Data) == 2 {
 			start := time.Now()
 			game.ClockStart = &start
