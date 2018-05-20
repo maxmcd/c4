@@ -1,0 +1,59 @@
+env:
+  es6: true
+extends: eslint:recommended
+parser: babel-eslint
+parserOptions:
+  ecmaVersion: 2018
+  sourceType: module
+  ecmaFeatures:
+    jsx: true
+    experimentalObjectRestSpread: true
+rules:
+  semi: "error"
+  no-console: "off"
+  react/jsx-uses-vars: "error"
+plugins:
+- flowtype
+- react
+- react-native
+- prettier
+globals:
+  $: false
+  __DEV__: true
+  __dirname: false
+  __fbBatchedBridgeConfig: false
+  alert: false
+  cancelAnimationFrame: false
+  cancelIdleCallback: false
+  clearImmediate: true
+  clearInterval: false
+  clearTimeout: false
+  console: false
+  document: false
+  escape: false
+  Event: false
+  EventTarget: false
+  expect: false
+  exports: false
+  fetch: false
+  FormData: false
+  global: false
+  it: true
+  jest: false
+  Map: true
+  localStorage: true
+  module: false
+  navigator: false
+  pit: false
+  process: false
+  Promise: true
+  requestAnimationFrame: true
+  requestIdleCallback: true
+  require: false
+  Set: true
+  setImmediate: true
+  setInterval: false
+  setTimeout: false
+  WebSocket: false
+  window: false
+  XMLHttpRequest: false

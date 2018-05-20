@@ -6,3 +6,6 @@ local.env
 **/.terraform/*
 *.tfstate
 *.tfstate.*
+
+# we don't have meaningful js dependencies, so we're not tracking yarn.lock
+yarn.lock
