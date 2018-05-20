@@ -164,7 +164,6 @@ func authorize(ctx context.Context) (context.Context, error) {
 	if !ok {
 		return nil, status.Error(codes.InvalidArgument, "Missing metadata")
 	}
-
 	bearerToken, ok := md["authorization"]
 	if !ok {
 		return nil, status.Error(codes.Unauthenticated, "Missing authorization token")

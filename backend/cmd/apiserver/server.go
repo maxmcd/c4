@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"os"
 	"sync"
 	"time"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/maxmcd/c4/backend/pkg/api"
+	"github.com/maxmcd/c4/backend/pkg/board"
 	"github.com/maxmcd/c4/backend/pkg/config"
 	"github.com/maxmcd/c4/backend/pkg/models"
 	"github.com/ttacon/libphonenumber"
@@ -23,6 +25,8 @@ import (
 // Errors
 var (
 	ErrGameIdNotFound = func(id string) error { return fmt.Errorf("Game id (%s) not found", id) }
+	ErrNotYourTurn    = func() error { return errors.New("Not your turn") }
+	ErrGameIsOver     = func() error { return errors.New("Game is over") }
 )
 
 type APIServer struct {
@@ -36,8 +40,10 @@ type APIServer struct {
 func NewAPIServer() (*APIServer, error) {
 	// TODO: Cleanly close database connection on API server close
 	// TODO: Shutdown pool on API server close
+
+	noDB := os.Getenv("NO_DB")
 	db, err := gorm.Open("postgres", config.DatabaseUrl("postgres"))
-	if err != nil {
+	if err != nil && noDB == "" {
 		return nil, err
 	}
 
@@ -78,11 +84,49 @@ func (s *APIServer) JoinPool(ctx context.Context, req *api.JoinPoolRequest) (*ap
 
 func (s *APIServer) SendMove(ctx context.Context, req *api.SendMoveRequest) (*api.SendMoveResponse, error) {
 	// Ensure that the game exists
-	if _, ok := s.games.Retrieve(req.Id); !ok {
+	userId := ctx.Value("userId").(int)
+	game, ok := s.games.Retrieve(req.Id)
+	if !ok {
 		return nil, ErrGameIdNotFound(req.Id)
 	}
+	command := req.Command
+	if command == "resign" {
+		userIdUint := uint(userId)
+		game.Resigned = &userIdUint
+	}
 
-	s.backplane.Publish(fmt.Sprintf("game.%s", req.Id), req)
+	// TODO: ensure this is threadsafe for duplicate moves from the same player
+
+	if game.Resigned == nil {
+		if (game.Board.WhoIsNext() == board.RED && uint(userId) != game.RedUser.ID) ||
+			(game.Board.WhoIsNext() == board.BLACK && uint(userId) != game.BlackUser.ID) {
+			return nil, ErrNotYourTurn()
+		}
+		isWon := game.Board.IsWon()
+		if isWon != 0 {
+			return nil, ErrGameIsOver()
+		}
+		game.Board.PlayMove(int(req.Column))
+		if game.ClockStart == nil && len(game.Board.Data) == 2 {
+			start := time.Now()
+			game.ClockStart = &start
+		}
+		if isWon == 0 && game.Board.ClockShouldBeStarted() {
+			if game.Board.WhoIsNext() == board.RED {
+				game.BlackTimeRemaining = time.Now().Sub(*game.ClockStart) - (game.TimeControl - game.RedTimeRemaining)
+			} else {
+				game.RedTimeRemaining = time.Now().Sub(*game.ClockStart) - (game.TimeControl - game.BlackTimeRemaining)
+			}
+		}
+	}
+
+	s.games.Update(req.Id, game)
+	s.backplane.Publish(fmt.Sprintf("game.%s", req.Id), &api.ReceiveMoveResponse{
+		Command:            req.Command,
+		Board:              game.Board.String(),
+		BlackTimeRemaining: uint64(game.RedTimeRemaining),
+		RedTimeRemaining:   uint64(game.BlackTimeRemaining),
+	})
 
 	return &api.SendMoveResponse{}, nil
 }
@@ -101,12 +145,9 @@ func (s *APIServer) ReceiveMove(req *api.ReceiveMoveRequest, stream api.GameServ
 	ctx, cancel := context.WithCancel(stream.Context())
 	s.backplane.Subscribe(ctx, fmt.Sprintf("game.%s", req.Id), func(move interface{}) {
 		glog.V(2).Infoln("ReceiveMove recevied module update: %+v", move)
-		moveRequest := move.(*api.SendMoveRequest)
-		if err := stream.Send(&api.ReceiveMoveResponse{
-			Command: moveRequest.Command,
-			Board:   moveRequest.Board,
-		}); err != nil {
+		if err := stream.Send(move.(*api.ReceiveMoveResponse)); err != nil {
 			// If we get an error, cancel the watch
+			glog.Error(err)
 			cancel()
 		}
 	})

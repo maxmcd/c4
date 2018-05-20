@@ -1,4 +1,4 @@
-package main
+package board
 
 import (
 	"errors"
@@ -20,24 +20,40 @@ var runeIntMap = map[rune]int{
 	'5': 5,
 	'6': 6,
 }
-
-type Board struct {
-	data []int
+var intStringMap = map[int]string{
+	0: "0",
+	1: "1",
+	2: "2",
+	3: "3",
+	4: "4",
+	5: "5",
+	6: "6",
 }
 
-func boardFromString(moves string) (board Board) {
+type Board struct {
+	Data []int
+}
+
+func BoardFromString(moves string) (board Board) {
 	for _, runeValue := range moves {
-		board.data = append(board.data, runeIntMap[runeValue])
+		board.Data = append(board.Data, runeIntMap[runeValue])
 	}
 	return
 }
 
-func (b *Board) playMove(column int) error {
-	if len(b.data) == 6*7 {
+func (b *Board) String() (out string) {
+	for _, column := range b.Data {
+		out += intStringMap[column]
+	}
+	return
+}
+
+func (b *Board) PlayMove(column int) error {
+	if len(b.Data) == 6*7 {
 		return errors.New("Board full")
 	}
 	var count int
-	for _, move := range b.data {
+	for _, move := range b.Data {
 		if move == column {
 			count += 1
 		}
@@ -45,27 +61,31 @@ func (b *Board) playMove(column int) error {
 	if count == 6 {
 		return errors.New("Column full")
 	}
-	b.data = append(b.data, column)
+	b.Data = append(b.Data, column)
 	return nil
 }
 
-func (b *Board) whoIsNext() int {
-	if len(b.data)%2 == 1 {
+func (b *Board) WhoIsNext() int {
+	if len(b.Data)%2 == 1 {
 		return BLACK
 	}
 	return RED
 }
 
+func (b *Board) ClockShouldBeStarted() bool {
+	return len(b.Data) > 1
+}
+
 func (b *Board) asMatrix() (board [7][6]int) {
 	var counters [7]int
-	for index, column := range b.data {
+	for index, column := range b.Data {
 		board[column][counters[column]] = (index % 2) + 1
 		counters[column] += 1
 	}
 	return
 }
 
-func (b *Board) isWon() int {
+func (b *Board) IsWon() int {
 	board := b.asMatrix()
 	// horizontalCheck
 	for j := 0; j < BOARD_HEIGHT-3; j++ {

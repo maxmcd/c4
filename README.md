@@ -1,6 +1,6 @@
 # C4
 
-Board state notation:
+Board state notation eg:
 "444444326555553233226131666"
 
 Features

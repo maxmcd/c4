@@ -18,8 +18,30 @@ type User struct {
 	Phone          *sql.NullInt64
 	CountryCode    *sql.NullInt64
 	Username       *sql.NullString
-	Rating         uint // 150000 => 1500.00
+	GamesPlayed    int
+	RatingScratch  int
 	NexmoRequestID string
+}
+
+func (u *User) FakeRating(desiredRating int) {
+	u.RatingScratch = desiredRating
+	u.GamesPlayed = 1
+}
+
+func (u *User) UpdateRating(won bool, opponentRating int) {
+	u.RatingScratch += opponentRating
+	if won {
+		u.RatingScratch += 40000 // 400.00
+	} else {
+		u.RatingScratch -= 40000 // -400.00
+	}
+}
+
+func (u *User) Rating() int {
+	if u.GamesPlayed == 0 {
+		return 150000 // 1500.00
+	}
+	return (u.RatingScratch) / u.GamesPlayed
 }
 
 func (u *User) UsernameString() (username string) {

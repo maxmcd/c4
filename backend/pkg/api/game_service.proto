@@ -39,7 +39,7 @@ message SendMoveRequest {
     string id = 1;
 
     string command = 2;
-    string board = 3;
+    int32 column = 3;
 }
 
 message SendMoveResponse {}
@@ -53,6 +53,8 @@ message ReceiveMoveResponse {
 
     string command = 2;
     string board = 3;
+    uint64 red_time_remaining = 4;
+    uint64 black_time_remaining = 5;
 }
 
 message Game {

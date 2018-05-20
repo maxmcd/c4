@@ -28,7 +28,7 @@ type Pool []PoolUser
 
 func (p Pool) Len() int           { return len(p) }
 func (p Pool) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
-func (p Pool) Less(i, j int) bool { return p[i].User.Rating < p[j].User.Rating }
+func (p Pool) Less(i, j int) bool { return p[i].User.Rating() < p[j].User.Rating() }
 
 func runPool(enterPoolChan chan PoolUser, done chan bool, gameStore *GameStore) {
 	users := []PoolUser{}
@@ -50,11 +50,12 @@ func runPool(enterPoolChan chan PoolUser, done chan bool, gameStore *GameStore) 
 
 				// for every second waited you're willing to add 100 points
 				// to your rating spread
-				ratingDiff := int(second.User.Rating) - int(first.User.Rating)
+				ratingDiff := second.User.Rating() - first.User.Rating()
 				firstAllowedSpread :=
 					int(time.Now().Sub(first.Joined).Seconds() * 10000)
 				secondAllowedSpread :=
 					int(time.Now().Sub(second.Joined).Seconds() * 10000)
+				// fmt.Println(ratingDiff, secondAllowedSpread, firstAllowedSpread)
 				if ratingDiff-firstAllowedSpread < 0 && ratingDiff-secondAllowedSpread < 0 {
 					i++ // skip the next round
 					matched[first.User.ID] = true

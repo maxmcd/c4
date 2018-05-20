@@ -135,6 +135,14 @@
         },
         "board": {
           "type": "string"
+        },
+        "red_time_remaining": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "black_time_remaining": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -147,8 +155,9 @@
         "command": {
           "type": "string"
         },
-        "board": {
-          "type": "string"
+        "column": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
