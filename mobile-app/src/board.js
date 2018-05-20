@@ -27,7 +27,7 @@ class Board {
         this.data = data || [];
     }
 
-    playMove(column: number): ?Error {
+    playMove = (column: number): ?Error => {
         if (this.data.length == BOARD_WIDTH * BOARD_HEIGHT) {
             return new Error("Board full");
         }
@@ -41,27 +41,27 @@ class Board {
             return new Error("Column full");
         }
         this.data.push(column);
-    }
-    whoIsNext(): number {
+    };
+    whoIsNext = (): number => {
         if (this.data.length % 2 == 1) {
             return BLACK;
         }
         return RED;
-    }
+    };
 
-    asMatrix(): Array<Array<number>> {
+    asMatrix = (): Array<Array<number>> => {
         let counters = new Array(BOARD_WIDTH).fill(0);
-        let board = new Array(BOARD_WIDTH).fill(
-            new Array(BOARD_HEIGHT).fill(0),
-        );
-        for (var i = 0; i < this.data.length; i++) {
-            const column = this.data[i];
+        let board = new Array(BOARD_WIDTH)
+            .fill()
+            .map(() => new Array(BOARD_HEIGHT).fill(0));
+        for (let i = 0; i < this.data.length; i++) {
+            let column = this.data[i];
             board[column][counters[column]] = i % 2 + 1;
             counters[column] += 1;
         }
         return board;
-    }
-    isWon(): number {
+    };
+    isWon = (): number => {
         const board = this.asMatrix();
         // horizontalCheck
         for (let j = 0; j < BOARD_HEIGHT - 3; j++) {
@@ -116,13 +116,13 @@ class Board {
             }
         }
         return 0;
-    }
+    };
 }
 
 const BoardFromString = (moves: string): Board => {
     let board = new Board();
-    for (var i = 0; i < moves.length; i++) {
-        board.data.push(stringIntMap[moves]);
+    for (let i = 0; i < moves.length; i++) {
+        board.data.push(stringIntMap[moves[i]]);
     }
     return board;
 };
@@ -130,4 +130,6 @@ const BoardFromString = (moves: string): Board => {
 module.exports = {
     Board: Board,
     BoardFromString: BoardFromString,
+    RED: RED,
+    BLACK: BLACK,
 };

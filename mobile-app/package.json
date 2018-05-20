@@ -6,5 +6,14 @@
     "flow-bin": "^0.72.0",
     "react": "16.3.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-27.0.0.tar.gz"
+  },
+  "devDependencies": {
+    "jest-expo": "^27.0.1"
+  },
+  "scripts": {
+    "test": "node_modules/.bin/jest"
+  },
+  "jest": {
+    "preset": "jest-expo"
   }
 }
