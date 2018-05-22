@@ -13,6 +13,11 @@ type Props = {
 type State = {};
 
 export default class IndexView extends React.Component<Props, State> {
+  componentDidMount() {
+    if (!this.props.control.User.username) {
+      this.props.control.logout();
+    }
+  }
   render() {
     return (
       <View style={styles.container}>
@@ -25,7 +30,6 @@ export default class IndexView extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
   },

@@ -5,7 +5,6 @@ CREATE TABLE users (
     phone INT,
     country_code INT,
     username TEXT UNIQUE,
-    nexmo_request_id TEXT,
     games_played INT DEFAULT 0,
     rating_scratch INT DEFAULT 0
 );

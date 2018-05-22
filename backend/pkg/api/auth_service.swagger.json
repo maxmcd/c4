@@ -78,20 +78,12 @@
       }
     },
     "apiAuthenticateResponse": {
-      "type": "object",
-      "properties": {
-        "request_id": {
-          "type": "string"
-        }
-      }
+      "type": "object"
     },
     "apiSmsCodeCheckRequest": {
       "type": "object",
       "properties": {
         "phone": {
-          "type": "string"
-        },
-        "request_id": {
           "type": "string"
         },
         "code": {

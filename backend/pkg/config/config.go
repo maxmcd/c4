@@ -25,8 +25,7 @@ var DB struct {
 
 // Secret defines external service api keys
 var ApiKeys struct {
-	NexmoKey    string `default:"notakey"`
-	NexmoSecret string `default:"notasecret"`
+	TwilioVerifyKey string `default:"notakey"`
 }
 
 // Auth defines environment for authentication

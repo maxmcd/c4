@@ -13,6 +13,12 @@ const tokenErrors = {
 
 type ApiResponse = Promise<[{ resp: ?{}, json: ?{} }, ?Error]>;
 
+type fetchOptions = {
+    method: string,
+    headers: {},
+    body?: string,
+};
+
 export default class Api {
     host: string;
     control: Control;
@@ -25,12 +31,19 @@ export default class Api {
         this.host = config.ApiHost;
         this.control = control;
     }
+    fetchWTimeout(url: string, options: fetchOptions) {
+        let promise = fetch(url, options);
+        return new Promise(function(resolve, reject) {
+            promise.then(resolve, reject);
+            // TODO: this doesn't cancel the request
+            // likely switch to XMLHttpRequest
+            // https://facebook.github.io/react-native/docs/network.html
+            // https://github.com/matthew-andrews/isomorphic-fetch/issues/48#issuecomment-380465212
+            setTimeout(reject.bind(null, new Error("Request timed out")), 5000);
+        });
+    }
     async fetch(path: string, method: string = "GET", body: ?{}): ApiResponse {
-        let options: {
-            method: string,
-            headers: {},
-            body?: string,
-        } = {
+        let options: fetchOptions = {
             method: method,
             headers: {
                 Accept: "application/json",
@@ -42,7 +55,7 @@ export default class Api {
             options.body = JSON.stringify(body);
         }
         let url = `http${config.tls ? "s" : ""}://${this.host}/v0/${path}`;
-        // console.log(url);
+        console.log(url);
         let resp = null;
         let json = null;
         try {
@@ -63,6 +76,21 @@ export default class Api {
             return Promise.resolve([{ resp, json }, e]);
         }
     }
+    updateUser(username: string): ApiResponse {
+        return this.fetch(`user`, "POST", { username: username });
+    }
+    joinPool(): ApiResponse {
+        return this.fetch(`game/join-pool`, "POST", {});
+    }
+    sendMove(gameId: string, command: string, column: number): ApiResponse {
+        return this.fetch(`game/${gameId}/send-move`, "POST", {
+            column: column,
+            command: command,
+        });
+    }
+    receiveMoves(gameId: string, onmessage: ({ data: {} }) => void): WebSocket {
+        return this.websocket(`game/${gameId}/recevie-move`, onmessage);
+    }
     websocket(path: string, onmessage: ({ data: {} }) => void): WebSocket {
         const url = `ws${config.tls ? "s" : ""}://${this.host}/v0/${path}`;
         console.log("WS connection to ", url);
@@ -82,14 +110,7 @@ export default class Api {
     authenticate(body: { phone: string }): ApiResponse {
         return this.fetch("authenticate", "POST", body);
     }
-    checkCode(body: {
-        phone: string,
-        request_id: string,
-        code: string,
-    }): ApiResponse {
+    checkCode(body: { phone: string, code: string }): ApiResponse {
         return this.fetch("authenticate/sms-code-check", "POST", body);
-    }
-    updateUser(username: string): ApiResponse {
-        return this.fetch(`user`, "POST", { username: username });
     }
 }

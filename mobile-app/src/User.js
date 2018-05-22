@@ -20,14 +20,12 @@ export default class User {
   token: ?string;
   username: ?string;
   email: ?string;
-  requestId: ?string;
   code: ?string;
   phoneNumber: ?string;
 
-  constructor(control: typeof Control) {
+  constructor(control: Control) {
     this.api = new Api(control);
     this.token = null;
-    this.requestId = null;
     this.code = null;
     this.phoneNumber = null;
   }
@@ -36,6 +34,7 @@ export default class User {
       const userSaveString = await AsyncStorage.getItem(
         config.UserSaveStoreKey,
       );
+      console.log(userSaveString);
       if (userSaveString) {
         let userSave: UserSave = JSON.parse(userSaveString);
         this.setToken(userSave.token);
@@ -61,11 +60,10 @@ export default class User {
     if (apiResp instanceof Promise) {
       apiResp = await apiResp;
     }
-    const [resp, err] = apiResp;
+    const [, err] = apiResp;
     if (err) {
       return err;
     }
-    this.requestId = resp.json.request_id;
     return null;
   }
   setToken(token: string): void {
@@ -74,12 +72,11 @@ export default class User {
     this.token = token;
   }
   async checkCode(code: string): Promise<?Error> {
-    if (!this.requestId || !this.phoneNumber) {
-      return new Error("Need requestId and phone number with checkCode");
+    if (!this.phoneNumber) {
+      return new Error("Need phone number with checkCode");
     }
     let apiResp = await this.api.checkCode({
       phone: this.phoneNumber,
-      request_id: this.requestId,
       code: code,
     });
     if (apiResp instanceof Promise) {
@@ -93,6 +90,18 @@ export default class User {
     this.username = resp.json.username;
     this.setToken(resp.json.token);
     await this.saveUser(resp.json);
+    return null;
+  }
+  async updateUser(username: string): Promise<?Error> {
+    let apiResp = await this.api.updateUser(username);
+    if (apiResp instanceof Promise) {
+      apiResp = await apiResp;
+    }
+    const [, err] = apiResp;
+    if (err) {
+      return err;
+    }
+    this.username = username;
     return null;
   }
   logout() {

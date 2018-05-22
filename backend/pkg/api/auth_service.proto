@@ -26,13 +26,10 @@ message AuthenticateRequest {
     string phone = 1;
 }
 
-message AuthenticateResponse {
-    string request_id = 1;
-}
+message AuthenticateResponse {}
 
 message SmsCodeCheckRequest {
     string phone = 1;
-    string request_id = 2;
     string code = 3;
 }
 

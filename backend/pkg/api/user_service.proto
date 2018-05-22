@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package api;
+
+import "google/api/annotations.proto";
+
+// AuthService specifies the interface through which clients authenticate
+service UserService {
+        rpc GetUser(GetUserRequest)
+                returns (GetUserResponse) {
+                        option (google.api.http) = {
+                                get: "/v0/user"
+                        };
+                }
+
+        rpc UpdateUser(UpdateUserRequest)
+                returns (UpdateUserResponse) {
+                        option (google.api.http) = {
+                                post: "/v0/user"
+                                body: "*"
+                        };
+                }
+}
+
+message GetUserRequest {}
+
+message GetUserResponse {
+    string username = 2;
+}
+
+
+message UpdateUserRequest {
+    string username = 2;
+}
+
+message UpdateUserResponse {}

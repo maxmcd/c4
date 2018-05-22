@@ -47,6 +47,7 @@ func runApiServer() {
 	)
 	api.RegisterAuthServiceServer(grpcServer, s)
 	api.RegisterGameServiceServer(grpcServer, s)
+	api.RegisterUserServiceServer(grpcServer, s)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d",
 		config.API.Port))
@@ -75,6 +76,9 @@ func runProxy() {
 		glog.Fatalf("Error registering auth proxy server: %s", err.Error())
 	}
 	if err := api.RegisterGameServiceHandlerFromEndpoint(ctx, mux, apiURL, opts); err != nil {
+		glog.Fatalf("Error registering auth proxy server: %s", err.Error())
+	}
+	if err := api.RegisterUserServiceHandlerFromEndpoint(ctx, mux, apiURL, opts); err != nil {
 		glog.Fatalf("Error registering auth proxy server: %s", err.Error())
 	}
 

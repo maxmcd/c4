@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"regexp"
 	"sync"
 	"time"
 
@@ -181,24 +182,15 @@ func (s *APIServer) Authenticate(ctx context.Context, req *api.AuthenticateReque
 		return nil, err
 	}
 
-	var request_id string
-	if user.Phone.Int64 == int64(2035559385) &&
-		user.CountryCode.Int64 == int64(1) {
-		request_id = "testing"
-	} else {
-		request_id, err = sendVerificationRequest(user)
+	if !(user.Phone.Int64 == int64(2035559385) &&
+		user.CountryCode.Int64 == int64(1)) {
+		err = sendVerificationRequest(user)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	if err := s.db.Model(&user).Update("nexmo_request_id", request_id).Error; err != nil {
-		return nil, err
-	}
-
-	return &api.AuthenticateResponse{
-		RequestId: request_id,
-	}, nil
+	return &api.AuthenticateResponse{}, nil
 }
 
 func (s *APIServer) SmsCodeCheck(ctx context.Context, req *api.SmsCodeCheckRequest) (*api.SmsCodeCheckResponse, error) {
@@ -217,13 +209,9 @@ func (s *APIServer) SmsCodeCheck(ctx context.Context, req *api.SmsCodeCheckReque
 		return nil, err
 	}
 
-	if req.RequestId == "" || req.RequestId != user.NexmoRequestID {
-		return nil, errors.New("Invalid request id")
-	}
-
 	if user.Phone.Int64 != int64(2035559385) &&
 		user.CountryCode.Int64 != int64(1) {
-		if err := confirmVerificationRequest(req.RequestId, req.Code); err != nil {
+		if err := confirmVerificationRequest(user, req.Code); err != nil {
 			return nil, err
 		}
 	}
@@ -237,4 +225,44 @@ func (s *APIServer) SmsCodeCheck(ctx context.Context, req *api.SmsCodeCheckReque
 		UserId:   uint64(user.ID),
 		Username: user.UsernameString(),
 	}, nil
+}
+
+// User Service Methods
+func (s *APIServer) GetUser(ctx context.Context, req *api.GetUserRequest) (
+	*api.GetUserResponse, error) {
+	var user models.User
+	if err := s.db.First(&user, ctx.Value("userId").(int)).Error; err != nil {
+		return nil, err
+	}
+
+	return &api.GetUserResponse{
+		Username: user.UsernameString(),
+	}, nil
+}
+
+func (s *APIServer) UpdateUser(ctx context.Context, req *api.UpdateUserRequest) (
+	*api.UpdateUserResponse, error) {
+	// Username only for now
+	if req.Username == "" {
+		return nil, errors.New("Username can't be blank")
+	}
+	isValidChars := regexp.MustCompile(`^[0-9A-Za-z_]+$`).MatchString
+	if !isValidChars(req.Username) {
+		return nil, errors.New(
+			"A username can only contain alphanumeric" +
+				" characters (letters A-Z, numbers 0-9) with" +
+				" the exception of underscores",
+		)
+	}
+
+	var user models.User
+	if err := s.db.First(&user, ctx.Value("userId").(int)).Error; err != nil {
+		return nil, err
+	}
+
+	if err := s.db.Model(&user).Update("username", req.Username).Error; err != nil {
+		return nil, err
+	}
+
+	return &api.UpdateUserResponse{}, nil
 }
