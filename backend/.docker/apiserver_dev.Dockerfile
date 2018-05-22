@@ -16,6 +16,6 @@ RUN dep ensure --vendor-only
 
 COPY . /go/src/github.com/maxmcd/c4/backend
 
-CMD fresh -c /go/src/github.com/maxmcd/c4/backend/fresh.conf -- -v=2
+CMD fresh -- -v=2
 
 EXPOSE 8080

@@ -6,10 +6,8 @@ CREATE TABLE users (
     country_code INT,
     username TEXT UNIQUE,
     nexmo_request_id TEXT,
-    rating INT DEFAULT 150000,
-    INDEX (phone),
-    INDEX (username),
-    INDEX (nexmo_request_id)
+    games_played INT DEFAULT 0,
+    rating_scratch INT DEFAULT 0
 );
 
 CREATE UNIQUE INDEX ON users (phone, country_code);

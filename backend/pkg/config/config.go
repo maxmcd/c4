@@ -18,7 +18,7 @@ var DB struct {
 	Username   string `default:"c4"`
 	Password   string `default:"password"`
 	Host       string `default:"postgres"`
-	Port       int    `default:"26257"`
+	Port       int    `default:"5432"`
 	Database   string `default:"c4"`
 	DisableSSL bool   `default:"true"`
 }
